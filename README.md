@@ -27,6 +27,6 @@ flask run backend
 # uv
 
 ```sh
-uv run flask run frontend
-uv run flask run backend
+uv run flask --app frontend run
+uv run flask --app backend run
 ```
