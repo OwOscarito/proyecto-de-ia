@@ -20,8 +20,8 @@ conda activate proyecto-de-ia
 # venv / conda
 
 ```sh
-flask run frontend
-flask run backend
+flask --app frontend run
+flask --app backend run
 ```
 
 # uv
