@@ -1,0 +1,17 @@
+[Unit]
+Description=PI Frontend (Flask via mod_wsgi-express)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/smartlight/proyecto-de-ia
+EnvironmentFile=%h/smartlight/proyecto-de-ia/.env
+Environment="PATH=%h/smartlight/proyecto-de-ia/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+ExecStart=/usr/bin/env mod_wsgi-express start-server %h/smartlight/proyecto-de-ia/frontend/application.wsgi --port ${FRONTEND_PORT} --processes 1 --threads 5 --socket-timeout 120 --log-to-terminal
+Restart=on-failure
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target
