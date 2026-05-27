@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Env files
+.env
+
+# Backend files
+backend/static/model
+backend/static/video

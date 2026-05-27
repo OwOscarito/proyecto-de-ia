@@ -2,6 +2,7 @@ name: proyecto-de-ia # This will become the name of your environment
 dependencies: # The list of packages to include in your environment
   - python=3.11
   - flask
+  - flask-socketio
   - requests
   - cudatoolkit
   - pip # Install pip in your environment

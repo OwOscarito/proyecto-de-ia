@@ -1,22 +1,19 @@
-import os
-
-from dotenv import load_dotenv
-from flask import Flask
-
-load_dotenv()
-
-secret_key = os.getenv("SECRET_KEY")
-
-app = Flask(__name__)
-app.secret_key = secret_key
+from flask import Flask, render_template
 
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+def create_app(base_path, backend_url, secret_key="dev"):
 
+    app = Flask(
+        __name__,
+        template_folder=base_path / "templates",
+        static_folder=base_path / "static",
+    )
+    app.config.from_mapping(
+        SECRET_KEY=secret_key,
+    )
 
-if __name__ == "__main__":
-    port = os.getenv("FRONTEND_PORT")
-    port = int(port) if port else None
-    app.run(port=port)
+    @app.route("/")
+    def index():
+        return render_template("index.html", backend_url=backend_url)
+
+    return app
