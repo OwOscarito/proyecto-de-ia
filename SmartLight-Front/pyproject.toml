@@ -1,0 +1,19 @@
+[project]
+name = "smartlight-back"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.136.3",
+]
+[[tool.uv.index]]
+name = "cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv]
+[[tool.uv.index]]
+name = "cuda"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
