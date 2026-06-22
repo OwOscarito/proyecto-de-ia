@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cámaras — Centro de Control</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>Cámaras configuradas</h1>
+          <p>Gestiona las cámaras del sistema y sus zonas de detección</p>
+        </div>
+        <a class="btn btn-primary" href="/admin/camaras/nueva">+ Agregar cámara</a>
+      </div>
+
+      {% if camaras %}
+      <div class="camera-grid">
+        {% for camara in camaras %}
+        <div class="camera-card">
+          <div
+            class="camera-thumb"
+            style="background-image: url('{{ backend_url }}/camaras/{{ camara.id }}/frame.jpg')"
+          >
+            <span class="status-dot {{ 'activa' if camara.activa else '' }}"></span>
+            <span class="tipo-badge">
+              {% if camara.fuente_tipo == 'webcam' %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M23 7l-7 5 7 5V7z" />
+                <rect x="1" y="5" width="15" height="14" rx="2" />
+              </svg>
+              Cámara en vivo
+              {% else %}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="23 7 16 12 23 17 23 7" />
+                <rect x="1" y="5" width="15" height="14" rx="2" />
+              </svg>
+              Video grabado
+              {% endif %}
+            </span>
+          </div>
+
+          <div class="camera-body">
+            <div class="nombre">
+              {{ camara.nombre }}
+              {% if camara.activa %}
+              <span class="badge badge-activa">activa</span>
+              {% else %}
+              <span class="badge badge-inactiva">inactiva</span>
+              {% endif %} {% if not camara.tiene_zona_vehicular or not
+              camara.tiene_zona_peatonal %}
+              <span class="badge badge-falta">faltan zonas</span>
+              {% endif %}
+            </div>
+            <div class="fuente">{{ camara.fuente }}</div>
+
+            <div class="camera-acciones">
+              <a class="btn" href="/admin/camaras/{{ camara.id }}/zonas">Zonas</a>
+              <a class="btn" href="/admin/camaras/{{ camara.id }}/editar">Editar</a>
+              {% if camara.activa %}
+              <a class="btn btn-primary" href="/">▶ Ver en vivo</a>
+              {% else %}
+              <form method="post" action="/admin/camaras/{{ camara.id }}/activar">
+                <button class="btn btn-primary" type="submit">Activar</button>
+              </form>
+              <form
+                method="post"
+                action="/admin/camaras/{{ camara.id }}/eliminar"
+                onsubmit="return confirm('¿Eliminar esta cámara?')"
+              >
+                <button class="btn btn-danger" type="submit">Eliminar</button>
+              </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        No hay cámaras configuradas todavía.<br />
+        <a class="btn btn-primary" style="margin-top: 12px" href="/admin/camaras/nueva"
+          >+ Agregar la primera cámara</a
+        >
+      </div>
+      {% endif %}
+    </main>
+  </body>
+</html>

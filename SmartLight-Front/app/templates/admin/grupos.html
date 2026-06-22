@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Corredores — Centro de Control</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>Corredores de semáforos</h1>
+          <p>Grupos de hasta 4 cámaras que coordinan sus ciclos (ola verde)</p>
+        </div>
+      </div>
+
+      <div class="card" style="max-width: 420px; margin-bottom: 24px">
+        <form method="post" class="form-camara">
+          <label>
+            Nombre del corredor
+            <input
+              type="text"
+              name="nombre"
+              required
+              placeholder="Ej: Av. Principal — tramo norte"
+            />
+          </label>
+          <button class="btn btn-primary" type="submit">+ Crear corredor</button>
+        </form>
+      </div>
+
+      {% if grupos %}
+      <div class="camera-grid">
+        {% for g in grupos %}
+        <div class="camera-card">
+          <div class="camera-body">
+            <div class="nombre">{{ g.nombre }}</div>
+            <div class="fuente">{{ g.n_camaras }} / 4 cámaras</div>
+            <div class="camera-acciones">
+              <a class="btn" href="/admin/grupos/{{ g.id }}">Gestionar</a>
+              {% if g.n_camaras > 0 %}
+              <a class="btn btn-primary" href="/admin/grupos/{{ g.id }}/corredor">▶ Ver corredor</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">Todavía no hay corredores creados.</div>
+      {% endif %}
+    </main>
+  </body>
+</html>

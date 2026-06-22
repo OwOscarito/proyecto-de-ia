@@ -1,0 +1,44 @@
+services:
+  back:
+    build:
+      context: .
+      dockerfile: SmartLight-Back.Dockerfile
+    ports:
+      - "8888:8888"
+    environment:
+      - DB_PATH=/data/smartlight.db
+      - UPLOADS_DIR=/data/uploads
+    volumes:
+      - back-data:/data
+    # Requiere el NVIDIA Container Toolkit instalado en el host.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped
+
+  front:
+    build:
+      context: .
+      dockerfile: SmartLight-Front.Dockerfile
+    ports:
+      - "8800:8800"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-dev}
+      # Dentro de la red de docker compose, el Front llega al Back por el
+      # nombre del servicio ("back"), no por localhost.
+      - BACKEND_HOST=http://back
+      - BACKEND_PORT=8888
+      # URL pública (IP/dominio real del servidor) que el NAVEGADOR del
+      # usuario puede resolver — distinta de BACKEND_HOST, que solo existe
+      # dentro de la red interna de docker compose. Ajustar en producción.
+      - BACKEND_PUBLIC_URL=${BACKEND_PUBLIC_URL:-http://localhost:8888}
+    depends_on:
+      - back
+    restart: unless-stopped
+
+volumes:
+  back-data:

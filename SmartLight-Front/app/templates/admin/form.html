@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ camara and "Editar" or "Nueva" }} cámara</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>{{ camara and "Editar cámara" or "Configurar nueva cámara" }}</h1>
+          <p>Conecta la fuente de video, igual que en una cámara de seguridad</p>
+        </div>
+      </div>
+
+      {% if paso_nuevo %}
+      {% with paso = 1 %}
+        {% include "admin/_pasos.html" %}
+      {% endwith %}
+      {% endif %}
+
+      {% if error %}
+      <div class="webcam-aviso" style="margin-bottom: 16px; color: #f87171; background: #1f0a0a; border-color: #3d0a0a">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <div class="card" style="max-width: 520px">
+        <form class="form-camara" method="post" enctype="multipart/form-data">
+          <label>
+            Nombre de la cámara
+            <input
+              type="text"
+              name="nombre"
+              required
+              value="{{ camara.nombre if camara else '' }}"
+              placeholder="Ej: Intersección Av. Principal"
+            />
+          </label>
+
+          <div class="tabs">
+            <div
+              class="tab-btn {{ 'active' if not camara or camara.fuente_tipo == 'archivo' else '' }}"
+              data-tab="archivo"
+            >
+              📼 Subir video
+            </div>
+            <div
+              class="tab-btn {{ 'active' if camara and camara.fuente_tipo == 'webcam' else '' }}"
+              data-tab="webcam"
+            >
+              🎥 Cámara en vivo
+            </div>
+          </div>
+
+          <div
+            class="tab-panel {{ 'active' if not camara or camara.fuente_tipo == 'archivo' else '' }}"
+            data-panel="archivo"
+          >
+            <input type="hidden" name="fuente_tipo" id="fuente_tipo" value="archivo" />
+            <label class="dropzone" id="dropzone">
+              <input
+                type="file"
+                name="video"
+                id="video-input"
+                accept="video/*"
+                style="display: none"
+              />
+              <div id="dropzone-texto">
+                Arrastra un video aquí o haz clic para elegir un archivo<br />
+                <small>.mp4, .avi, .mov — simula la grabación de una cámara IP local</small>
+              </div>
+              {% if camara and camara.fuente_tipo == 'archivo' %}
+              <div class="filename">Fuente actual: {{ camara.fuente }}</div>
+              {% endif %}
+            </label>
+          </div>
+
+          <div
+            class="tab-panel {{ 'active' if camara and camara.fuente_tipo == 'webcam' else '' }}"
+            data-panel="webcam"
+          >
+            <label>
+              Índice del dispositivo de cámara (en el servidor)
+              <input
+                type="text"
+                name="device_index"
+                value="{{ camara.fuente if camara and camara.fuente_tipo == 'webcam' else '0' }}"
+              />
+            </label>
+
+            <button type="button" class="btn" id="btn-probar-webcam">
+              Probar cámara en este navegador
+            </button>
+            <video id="webcam-video" class="webcam-preview" autoplay muted style="display: none"></video>
+            <div id="webcam-error" style="font-size: 12px; color: #f87171"></div>
+
+            <div class="webcam-aviso">
+              Esta vista previa usa la cámara de <strong>tu navegador</strong> solo para
+              confirmar que hay una cámara disponible. La detección real la hace el
+              servidor leyendo el dispositivo con el índice indicado arriba (por ejemplo,
+              una cámara USB conectada a la Raspberry Pi).
+            </div>
+          </div>
+
+          <label>
+            Ubicación de la cámara
+            <div class="ubicacion-hint">
+              Haz clic en el mapa para marcar dónde está instalada esta cámara.
+            </div>
+          </label>
+          <div id="mapa-ubicacion" class="mapa-ubicacion"></div>
+          <div id="ubicacion-texto" class="ubicacion-texto">Sin ubicación marcada.</div>
+          <input
+            type="hidden"
+            name="latitud"
+            id="input-latitud"
+            value="{{ camara.latitud if camara and camara.latitud is not none else '' }}"
+          />
+          <input
+            type="hidden"
+            name="longitud"
+            id="input-longitud"
+            value="{{ camara.longitud if camara and camara.longitud is not none else '' }}"
+          />
+
+          <label>
+            Sincronización con semáforos vecinos
+            <div class="ubicacion-hint">
+              Si este cruce depende de otros semáforos (corredor), agrúpalos aquí
+              (máximo 4 cámaras por grupo).
+            </div>
+          </label>
+          <select name="grupo_id" id="select-grupo">
+            <option value="">Cruce aislado (sin dependencia)</option>
+            {% for g in grupos %}
+            <option
+              value="{{ g.id }}"
+              {{ 'selected' if camara and camara.grupo_id == g.id else '' }}
+            >
+              {{ g.nombre }} ({{ g.n_camaras }}/4)
+            </option>
+            {% endfor %}
+          </select>
+
+          <div id="campos-grupo" style="display: {{ 'block' if camara and camara.grupo_id else 'none' }}">
+            <label>
+              Offset (segundos) respecto al semáforo maestro
+              <input
+                type="number"
+                name="offset_segundos"
+                min="0"
+                value="{{ camara.offset_segundos if camara else 0 }}"
+              />
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; text-transform: none; margin-top: 8px">
+              <input
+                type="checkbox"
+                name="es_maestro"
+                style="width: auto; margin: 0"
+                {{ 'checked' if camara and camara.es_maestro else '' }}
+              />
+              Esta cámara es el semáforo maestro del grupo
+            </label>
+          </div>
+
+          <button class="btn btn-primary" type="submit">Guardar cámara</button>
+        </form>
+      </div>
+
+      <a class="btn" style="margin-top: 16px" href="/admin/">← Volver</a>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const latInicial = {{ (camara.latitud if camara and camara.latitud is not none else 4.6097) }};
+      const lngInicial = {{ (camara.longitud if camara and camara.longitud is not none else -74.0817) }};
+      const teniaUbicacion = {{ 'true' if camara and camara.latitud is not none else 'false' }};
+
+      const mapaUbicacion = L.map("mapa-ubicacion").setView(
+        [latInicial, lngInicial],
+        teniaUbicacion ? 15 : 5
+      );
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap",
+      }).addTo(mapaUbicacion);
+
+      let marcador = teniaUbicacion
+        ? L.marker([latInicial, lngInicial]).addTo(mapaUbicacion)
+        : null;
+
+      const inputLat = document.getElementById("input-latitud");
+      const inputLng = document.getElementById("input-longitud");
+      const ubicacionTexto = document.getElementById("ubicacion-texto");
+
+      if (teniaUbicacion) {
+        ubicacionTexto.textContent = `Lat ${latInicial.toFixed(5)}, Lng ${lngInicial.toFixed(5)}`;
+      }
+
+      mapaUbicacion.on("click", (e) => {
+        const { lat, lng } = e.latlng;
+
+        if (marcador) {
+          marcador.setLatLng(e.latlng);
+        } else {
+          marcador = L.marker(e.latlng).addTo(mapaUbicacion);
+        }
+
+        inputLat.value = lat;
+        inputLng.value = lng;
+        ubicacionTexto.textContent = `Lat ${lat.toFixed(5)}, Lng ${lng.toFixed(5)}`;
+      });
+
+      const selectGrupo = document.getElementById("select-grupo");
+      const camposGrupo = document.getElementById("campos-grupo");
+
+      selectGrupo.addEventListener("change", () => {
+        camposGrupo.style.display = selectGrupo.value ? "block" : "none";
+      });
+
+      const tabBtns = document.querySelectorAll(".tab-btn");
+      const panels = document.querySelectorAll(".tab-panel");
+      const fuenteTipoInput = document.getElementById("fuente_tipo");
+
+      tabBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          tabBtns.forEach((b) => b.classList.remove("active"));
+          panels.forEach((p) => p.classList.remove("active"));
+          btn.classList.add("active");
+          document
+            .querySelector(`.tab-panel[data-panel="${btn.dataset.tab}"]`)
+            .classList.add("active");
+          fuenteTipoInput.value = btn.dataset.tab;
+        });
+      });
+
+      const dropzone = document.getElementById("dropzone");
+      const videoInput = document.getElementById("video-input");
+      const dropzoneTexto = document.getElementById("dropzone-texto");
+
+      dropzone.addEventListener("click", () => videoInput.click());
+
+      ["dragover", "dragleave", "drop"].forEach((evt) => {
+        dropzone.addEventListener(evt, (e) => {
+          e.preventDefault();
+          dropzone.classList.toggle("dragover", evt === "dragover");
+        });
+      });
+
+      dropzone.addEventListener("drop", (e) => {
+        if (e.dataTransfer.files.length) {
+          videoInput.files = e.dataTransfer.files;
+          mostrarNombreArchivo();
+        }
+      });
+
+      videoInput.addEventListener("change", mostrarNombreArchivo);
+
+      function mostrarNombreArchivo() {
+        if (videoInput.files.length) {
+          dropzoneTexto.innerHTML =
+            "Archivo seleccionado: <strong>" + videoInput.files[0].name + "</strong>";
+        }
+      }
+
+      document
+        .getElementById("btn-probar-webcam")
+        .addEventListener("click", async () => {
+          const video = document.getElementById("webcam-video");
+          const error = document.getElementById("webcam-error");
+          error.textContent = "";
+
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+            });
+            video.srcObject = stream;
+            video.style.display = "block";
+          } catch (err) {
+            error.textContent =
+              "No se pudo acceder a la cámara del navegador: " + err.message;
+          }
+        });
+    </script>
+  </body>
+</html>

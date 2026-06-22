@@ -1,0 +1,33 @@
+INFO:     Started server process [18388]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8888 (Press CTRL+C to quit)
+INFO:     127.0.0.1:57691 - "GET /socket.io/?transport=polling&EIO=4&t=1782161664.2178106 HTTP/1.1" 200 OK
+Cliente conectado: bdVjp8dqdukmTt7UAAAB
+INFO:     127.0.0.1:57691 - "POST /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161664.2335532 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57691 - "POST /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA HTTP/1.1" 200 OK
+[31m[1mrequirements:[0m Ultralytics requirement ['lap>=0.5.12'] not found, attempting AutoUpdate...
+Resolved 2 packages in 566ms
+Downloading lap (1.4MiB)
+ Downloaded lap
+Prepared 1 package in 294ms
+warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+         If the cache and target directories are on different filesystems, hardlinking may not be supported.
+         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Installed 1 package in 181ms
+ + lap==0.5.13
+
+[31m[1mrequirements:[0m AutoUpdate success  3.1s
+WARNING [31m[1mrequirements:[0m [1mRestart runtime or rerun command for updates to take effect[0m
+
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161664.3180835 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161675.4587047 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161676.0027025 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161676.5871828 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161677.1768947 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161677.5872147 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161678.0679555 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57692 - "GET /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA&t=1782161678.5178967 HTTP/1.1" 200 OK
+Cliente desconectado: bdVjp8dqdukmTt7UAAAB
+INFO:     127.0.0.1:55043 - "POST /socket.io/?transport=polling&EIO=4&sid=oqBG1Xs8St-UHcW_AAAA HTTP/1.1" 200 OK

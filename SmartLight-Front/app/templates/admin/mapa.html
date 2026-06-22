@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mapa de cámaras — Centro de Control</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>Mapa de cámaras</h1>
+          <p>Ubicación geográfica de las cámaras configuradas</p>
+        </div>
+        <a class="btn btn-primary" href="/admin/camaras/nueva">+ Agregar cámara</a>
+      </div>
+
+      <div id="mapa-camaras" class="mapa-camaras"></div>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      const camaras = {{ camaras | tojson }};
+      const conUbicacion = camaras.filter(
+        (c) => c.latitud !== null && c.longitud !== null
+      );
+
+      const centro = conUbicacion.length
+        ? [conUbicacion[0].latitud, conUbicacion[0].longitud]
+        : [4.6097, -74.0817];
+
+      const mapa = L.map("mapa-camaras").setView(centro, conUbicacion.length ? 13 : 5);
+
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap",
+      }).addTo(mapa);
+
+      conUbicacion.forEach((c) => {
+        const marcador = L.marker([c.latitud, c.longitud]).addTo(mapa);
+        const estado = c.activa
+          ? '<span style="color:#4ade80">● activa</span>'
+          : '<span style="color:#666">● inactiva</span>';
+
+        marcador.bindPopup(`
+          <div class="popup-camara">
+            <div class="popup-nombre">${c.nombre}</div>
+            <div>${estado}</div>
+            <div style="margin-top:8px">
+              <a href="/admin/camaras/${c.id}/zonas">Ver zonas</a> ·
+              <a href="/admin/camaras/${c.id}/editar">Editar</a>
+            </div>
+          </div>
+        `);
+      });
+
+      if (conUbicacion.length > 1) {
+        mapa.fitBounds(conUbicacion.map((c) => [c.latitud, c.longitud]), {
+          padding: [40, 40],
+        });
+      }
+
+      if (camaras.length && !conUbicacion.length) {
+        document.getElementById("mapa-camaras").insertAdjacentHTML(
+          "afterend",
+          '<div class="empty-state" style="margin-top: 16px">Ninguna cámara tiene ubicación configurada todavía. Edita una cámara y marca su posición en el mapa.</div>'
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -12,9 +12,23 @@ ENV UV_LINK_MODE=copy
 # Omit development dependencies
 ENV UV_NO_DEV=1
 
-# Sync environment, but exclude torch-related deps already present in the base image
-RUN uv sync --locked --exclude torch --exclude torchvision --exclude torchaudio
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-# some more preparation ...
+COPY SmartLight-Back/pyproject.toml SmartLight-Back/uv.lock ./
 
-CMD ["uv", "run", "uvicorn"]
+# torch/torchvision ya vienen instalados en la imagen base de NVIDIA con el
+# build CUDA correcto para la GPU del host; instalarlos otra vez desde PyPI
+# duplicaría ~6GB y podría traer una versión de CUDA distinta a la del driver.
+RUN uv sync --locked --no-install-package torch --no-install-package torchvision
+
+COPY SmartLight-Back/app ./app
+
+# Rutas por defecto para la BD y los videos subidos. En producción deben
+# apuntar a un volumen montado (ver docker-compose.yml) para que sobrevivan
+# a un reinicio del contenedor.
+ENV DB_PATH=/data/smartlight.db
+ENV UPLOADS_DIR=/data/uploads
+
+EXPOSE 8888
+
+CMD ["uv", "run", "uvicorn", "app.main:asgi_app", "--host", "0.0.0.0", "--port", "8888"]

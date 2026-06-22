@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ grupo.nombre }} — Corredor en vivo</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>{{ grupo.nombre }} — corredor en vivo</h1>
+          <p>Las cámaras de este grupo coordinan su ciclo (ola verde)</p>
+        </div>
+        <div id="status-global" style="font-size: 12px; color: #555">Conectando...</div>
+      </div>
+
+      <div class="corredor-grid">
+        {% for c in grupo.camaras %}
+        <div class="card corredor-panel" data-camara-id="{{ c.id }}">
+          <div class="corredor-nombre">
+            {{ c.nombre }}
+            {% if c.es_maestro %}
+            <span class="badge badge-activa">maestro</span>
+            {% endif %}
+          </div>
+          <canvas class="corredor-canvas"></canvas>
+          <div class="corredor-fase fase">--</div>
+          <div class="corredor-metrics">
+            <span>⏱ <span class="corredor-tiempo">--</span>s</span>
+            <span>🚗 <span class="corredor-nveh">0</span></span>
+            <span>🚶 <span class="corredor-npeat">0</span></span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <a class="btn" style="margin-top: 16px" href="/admin/grupos/{{ grupo.id }}">← Volver al grupo</a>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+      const SOCKET_URL = "{{ backend_url }}";
+      const camarasIds = {{ grupo.camaras | map(attribute='id') | list | tojson }};
+
+      const normalizedUrl =
+        SOCKET_URL.startsWith("http://") || SOCKET_URL.startsWith("https://")
+          ? SOCKET_URL
+          : `${window.location.protocol}//${SOCKET_URL}`;
+
+      const socket = io(normalizedUrl, { transports: ["polling"], upgrade: false });
+      const statusEl = document.getElementById("status-global");
+
+      socket.on("connect", () => {
+        statusEl.textContent = "Conectado ✓";
+        camarasIds.forEach((id) => socket.emit("ver_camara", { camara_id: id }));
+      });
+
+      socket.on("connect_error", (err) => {
+        statusEl.textContent = "Error de conexión — reintentando...";
+        console.error(err);
+      });
+
+      socket.on("disconnect", () => {
+        statusEl.textContent = "Desconectado";
+      });
+
+      socket.on("video_frame", (msg) => {
+        const panel = document.querySelector(
+          `.corredor-panel[data-camara-id="${msg.camara_id}"]`
+        );
+        if (!panel) return;
+
+        const canvas = panel.querySelector(".corredor-canvas");
+        const ctx = canvas.getContext("2d");
+        const img = new Image();
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+        };
+        img.src = "data:image/jpeg;base64," + msg.frame;
+
+        const faseEl = panel.querySelector(".corredor-fase");
+        faseEl.textContent = msg.fase || "--";
+        faseEl.className = "corredor-fase fase " + (msg.fase || "").replace(/ /g, ".");
+
+        panel.querySelector(".corredor-tiempo").textContent = msg.tiempo_restante;
+        panel.querySelector(".corredor-nveh").textContent = msg.n_veh;
+        panel.querySelector(".corredor-npeat").textContent = msg.n_peat;
+      });
+    </script>
+  </body>
+</html>

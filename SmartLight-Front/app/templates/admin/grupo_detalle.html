@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ grupo.nombre }} — Corredor</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>{{ grupo.nombre }}</h1>
+          <p>{{ grupo.camaras | length }} / {{ max_camaras }} cámaras en este corredor</p>
+        </div>
+        {% if grupo.camaras %}
+        <a class="btn btn-primary" href="/admin/grupos/{{ grupo.id }}/corredor">▶ Ver corredor en vivo</a>
+        {% endif %}
+      </div>
+
+      {% if grupo.camaras %}
+      <div class="camera-grid">
+        {% for c in grupo.camaras %}
+        <div class="camera-card">
+          <div class="camera-body">
+            <div class="nombre">
+              {{ c.nombre }}
+              {% if c.es_maestro %}
+              <span class="badge badge-activa">maestro</span>
+              {% endif %}
+            </div>
+            <div class="fuente">Offset: {{ c.offset_segundos }}s</div>
+            <div class="camera-acciones">
+              <a class="btn" href="/admin/camaras/{{ c.id }}/editar">Editar / cambiar offset</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        Este corredor todavía no tiene cámaras. Edita una cámara existente y
+        asígnala a "{{ grupo.nombre }}" desde su formulario.
+      </div>
+      {% endif %}
+
+      <a class="btn" style="margin-top: 16px" href="/admin/grupos">← Volver a corredores</a>
+    </main>
+  </body>
+</html>
