@@ -17,13 +17,16 @@ dependencies = [
     "torchvision",
     "ultralytics"
 ]
-[[tool.uv.index]]
-name = "cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
 
-[tool.uv]
 [[tool.uv.index]]
-name = "cuda"
+name = "pytorch-cu130"
 url = "https://download.pytorch.org/whl/cu130"
 explicit = true
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cu130" },
+]
+torchvision = [
+  { index = "pytorch-cu130" },
+]

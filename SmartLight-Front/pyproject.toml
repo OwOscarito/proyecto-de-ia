@@ -1,5 +1,5 @@
 [project]
-name = "smartlight-back"
+name = "smartlight-front"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -12,13 +12,3 @@ dependencies = [
     "python-multipart>=0.0.20",
     "uvicorn>=0.49.0",
 ]
-[[tool.uv.index]]
-name = "cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-
-[tool.uv]
-[[tool.uv.index]]
-name = "cuda"
-url = "https://download.pytorch.org/whl/cu130"
-explicit = true

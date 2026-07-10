@@ -1,32 +1,18 @@
-# Preparar env
+# Podman image
 
-## venv
+## Build images
 
 ```sh
-python -m venv venv
-source venv/bin/activate
-pip install requirements.txt
+podman build -t localhost/smartlight-front -f SmartLight-Front.Dockerfile https://github.com/OwOscarito/proyecto-de-ia.git#fastapi_back_rewrite
+
+podman build -t localhost/smartlight-back -f SmartLight-Back.Dockerfile https://github.com/OwOscarito/proyecto-de-ia.git#fastapi_back_rewrite
 ```
 
-## Conda
+## Podman quadlets
 
 ```sh
-conda create -f conda-env.yml
-conda activate proyecto-de-ia
-```
+cp containers/. ~/.config/containers/systemd/.
 
-# Ejecutar
-
-# venv / conda
-
-```sh
-flask --app frontend run
-flask --app backend run
-```
-
-# uv
-
-```sh
-uv run flask --app frontend run
-uv run flask --app backend run
+systemctl --user start smartlight-front
+systemctl --user start smartlight-back
 ```
