@@ -9,6 +9,7 @@ Image=localhost/smartlight-back
 
 AddDevice=nvidia.com/gpu=0
 
+Volume=./data:/data
 Environment=DB_PATH=/data/smartlight.db
 Environment=UPLOADS_DIR=/data/uploads
 
