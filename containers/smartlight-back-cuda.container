@@ -4,8 +4,10 @@ Description=Smartlight Back
 [Container]
 ContainerName=smartlight-back
 HostName=smartlight-back
-#Image=smartlight-back.build
-Image=localhost/smartlight-back
+#Image=smartlight-front.build
+Image=localhost/smartlight-back-cuda
+
+AddDevice=nvidia.com/gpu=0
 
 Volume=./data:/data
 Environment=DB_PATH=/data/smartlight.db

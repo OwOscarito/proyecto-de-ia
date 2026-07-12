@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM nvcr.io/nvidia/pytorch:26.05-py3
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ COPY SmartLight-Back/pyproject.toml SmartLight-Back/uv.lock ./
 # torch/torchvision ya vienen instalados en la imagen base de NVIDIA con el
 # build CUDA correcto para la GPU del host; instalarlos otra vez desde PyPI
 # duplicaría ~6GB y podría traer una versión de CUDA distinta a la del driver.
-RUN uv sync --locked
+RUN uv sync --locked --no-install-package torch --no-install-package torchvision
 
 COPY SmartLight-Back/app ./app
 
