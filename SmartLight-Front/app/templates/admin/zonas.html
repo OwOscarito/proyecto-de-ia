@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Zonas — {{ camara.nombre }}</title>
+    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link rel="stylesheet" href="/static/styles/admin.css" />
+  </head>
+  <body class="admin-body">
+    {% include "admin/_sidebar.html" %}
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1>Zonas de {{ camara.nombre }}</h1>
+          <p>Dibuja las zonas vehicular y peatonal sobre el frame capturado</p>
+        </div>
+      </div>
+
+      {% if paso_nuevo %}
+      {% with paso = 2 %}
+        {% include "admin/_pasos.html" %}
+      {% endwith %}
+      {% endif %}
+
+      <div class="zona-layout">
+        <div class="zona-controles">
+          <div class="card">
+            <h3>Tipo de zona</h3>
+            <select id="tipo-zona" class="tipo-zona">
+              <option value="vehicular">Vehicular</option>
+              <option value="peatonal">Peatonal</option>
+            </select>
+            <label style="margin-top: 10px; display: flex; align-items: center; gap: 8px">
+              Color
+              <input type="color" id="color-zona" />
+            </label>
+          </div>
+
+          <div class="card">
+            <h3>Puntos del polígono</h3>
+            <div id="lista-puntos" class="lista-puntos">
+              <div style="font-size: 12px; color: #555">Sin puntos todavía.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Instrucciones</h3>
+            <div style="font-size: 12px; color: #aaa; line-height: 1.6">
+              Haz clic sobre la imagen para agregar puntos. Arrastra un punto
+              para moverlo. Usa la × de la lista para eliminarlo. Necesitas al
+              menos 3 puntos por zona.
+            </div>
+          </div>
+
+          <button class="btn" id="btn-refrescar">Refrescar frame</button>
+          <button class="btn" id="btn-limpiar">Limpiar puntos actuales</button>
+          <button class="btn btn-primary" id="btn-guardar">
+            Guardar zona
+          </button>
+          <div id="msg" style="font-size: 12px; color: #4ade80"></div>
+
+          {% if paso_nuevo %}
+          <a class="btn btn-primary" href="/admin/">Finalizar configuración ✓</a>
+          {% else %}
+          <a class="btn" href="/admin/">← Volver</a>
+          {% endif %}
+        </div>
+
+        <canvas id="canvas"></canvas>
+      </div>
+    </main>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const frameUrl = "{{ backend_url }}/camaras/{{ camara.id }}/frame.jpg";
+      const zonaVehicularInicial = {{ camara.zona_vehicular | tojson }};
+      const zonaPeatonalInicial = {{ camara.zona_peatonal | tojson }};
+
+      const puntos = {
+        vehicular: zonaVehicularInicial || [],
+        peatonal: zonaPeatonalInicial || [],
+      };
+
+      const colores = {
+        vehicular: "{{ camara.color_vehicular }}",
+        peatonal: "{{ camara.color_peatonal }}",
+      };
+      const RADIO_PUNTO = 6;
+
+      let img = new Image();
+      let arrastrando = null; // índice del punto que se está arrastrando
+
+      const inputColor = document.getElementById("color-zona");
+
+      function tipoActual() {
+        return document.getElementById("tipo-zona").value;
+      }
+
+      function sincronizarInputColor() {
+        inputColor.value = colores[tipoActual()];
+      }
+
+      inputColor.addEventListener("input", () => {
+        colores[tipoActual()] = inputColor.value;
+        dibujar();
+      });
+
+      function dibujar() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        for (const tipo of ["vehicular", "peatonal"]) {
+          const pts = puntos[tipo];
+          if (!pts || pts.length === 0) continue;
+
+          const activo = tipo === tipoActual();
+          ctx.strokeStyle = colores[tipo];
+          ctx.fillStyle = colores[tipo];
+          ctx.globalAlpha = activo ? 1 : 0.4;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(pts[0][0], pts[0][1]);
+          for (let i = 1; i < pts.length; i++) {
+            ctx.lineTo(pts[i][0], pts[i][1]);
+          }
+          if (pts.length > 2) ctx.closePath();
+          ctx.stroke();
+
+          for (const [x, y] of pts) {
+            ctx.beginPath();
+            ctx.arc(x, y, RADIO_PUNTO, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        actualizarListaPuntos();
+      }
+
+      function actualizarListaPuntos() {
+        const tipo = tipoActual();
+        const pts = puntos[tipo];
+        const lista = document.getElementById("lista-puntos");
+
+        if (!pts || pts.length === 0) {
+          lista.innerHTML =
+            '<div style="font-size: 12px; color: #555">Sin puntos todavía.</div>';
+          return;
+        }
+
+        lista.innerHTML = pts
+          .map(
+            (p, i) => `
+            <div class="punto-item">
+              <span>#${i + 1} (${p[0]}, ${p[1]})</span>
+              <button type="button" class="punto-borrar" data-i="${i}">×</button>
+            </div>`
+          )
+          .join("");
+
+        lista.querySelectorAll(".punto-borrar").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            puntos[tipo].splice(Number(btn.dataset.i), 1);
+            dibujar();
+          });
+        });
+      }
+
+      function cargarFrame() {
+        img = new Image();
+        img.onload = dibujar;
+        img.src = frameUrl + "?t=" + Date.now();
+      }
+
+      cargarFrame();
+      sincronizarInputColor();
+
+      document.getElementById("tipo-zona").addEventListener("change", () => {
+        sincronizarInputColor();
+        dibujar();
+      });
+      document.getElementById("btn-refrescar").addEventListener("click", cargarFrame);
+
+      function coordsCanvas(e) {
+        const rect = canvas.getBoundingClientRect();
+        return [
+          Math.round(((e.clientX - rect.left) / rect.width) * canvas.width),
+          Math.round(((e.clientY - rect.top) / rect.height) * canvas.height),
+        ];
+      }
+
+      function puntoEnPosicion(x, y) {
+        const pts = puntos[tipoActual()];
+        for (let i = 0; i < pts.length; i++) {
+          const dx = pts[i][0] - x;
+          const dy = pts[i][1] - y;
+          if (Math.sqrt(dx * dx + dy * dy) <= RADIO_PUNTO + 3) return i;
+        }
+        return -1;
+      }
+
+      canvas.addEventListener("mousedown", (e) => {
+        const [x, y] = coordsCanvas(e);
+        const i = puntoEnPosicion(x, y);
+        if (i !== -1) arrastrando = i;
+      });
+
+      canvas.addEventListener("mousemove", (e) => {
+        if (arrastrando === null) return;
+        const [x, y] = coordsCanvas(e);
+        puntos[tipoActual()][arrastrando] = [x, y];
+        dibujar();
+      });
+
+      window.addEventListener("mouseup", () => {
+        arrastrando = null;
+      });
+
+      canvas.addEventListener("click", (e) => {
+        if (arrastrando !== null) return;
+        const [x, y] = coordsCanvas(e);
+        if (puntoEnPosicion(x, y) !== -1) return;
+        puntos[tipoActual()].push([x, y]);
+        dibujar();
+      });
+
+      document.getElementById("btn-limpiar").addEventListener("click", () => {
+        puntos[tipoActual()] = [];
+        dibujar();
+      });
+
+      document.getElementById("btn-guardar").addEventListener("click", () => {
+        const tipo = tipoActual();
+        const msg = document.getElementById("msg");
+
+        if (puntos[tipo].length < 3) {
+          msg.style.color = "#f87171";
+          msg.textContent = "Necesitas al menos 3 puntos.";
+          return;
+        }
+
+        fetch(window.location.href, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tipo,
+            puntos: puntos[tipo],
+            color: colores[tipo],
+          }),
+        })
+          .then((r) => r.json())
+          .then(() => {
+            msg.style.color = "#4ade80";
+            msg.textContent = "Zona " + tipo + " guardada ✓";
+          })
+          .catch(() => {
+            msg.style.color = "#f87171";
+            msg.textContent = "Error al guardar.";
+          });
+      });
+    </script>
+  </body>
+</html>

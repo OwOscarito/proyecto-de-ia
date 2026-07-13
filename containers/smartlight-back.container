@@ -1,0 +1,17 @@
+[Unit]
+Description=Smartlight Back
+
+[Container]
+ContainerName=smartlight-back
+HostName=smartlight-back
+#Image=smartlight-back.build
+Image=localhost/smartlight-back
+
+Volume=./data:/data
+Environment=DB_PATH=/data/smartlight.db
+Environment=UPLOADS_DIR=/data/uploads
+
+PublishPort=8888:8888
+
+[Install]
+WantedBy=default.target

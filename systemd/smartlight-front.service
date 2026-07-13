@@ -1,0 +1,22 @@
+[Unit]
+Description=Smartlight Front
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/smartlight/SmartLight-Front
+
+#Environment=SECRET_KEY=${SECRET_KEY:-dev}
+#Environment=FRONTEND_SUBPATH=/smartlight
+
+Environment=BACKEND_HOST=http://back
+Environment=BACKEND_PORT=8888
+#Environment=BACKEND_PUBLIC_URL=${BACKEND_PUBLIC_URL:-http://localhost:8888}
+
+ExecStart=%h/.local/bin/uv run uvicorn app.main:asgi_app --host 0.0.0.0 --port 8800
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

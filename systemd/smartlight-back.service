@@ -1,0 +1,18 @@
+[Unit]
+Description=Smartlight Back
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/smartlight/SmartLight-Back
+
+Environment=DB_PATH=/data/smartlight.db
+Environment=UPLOADS_DIR=/data/uploads
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin
+ExecStart=%h/.local/bin/uv run uvicorn app.main:asgi_app --host 0.0.0.0 --port 7088
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

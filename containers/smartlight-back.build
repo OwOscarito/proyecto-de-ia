@@ -1,0 +1,4 @@
+[Build]
+ImageTag=localhost/localhost/smartlight-back:latest
+SetWorkingDirectory=https://github.com/OwOscarito/proyecto-de-ia.git#fastapi_back_rewrite
+File=SmartLight-Back.Dockerfile

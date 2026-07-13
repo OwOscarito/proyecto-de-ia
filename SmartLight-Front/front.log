@@ -1,0 +1,20 @@
+INFO:     Started server process [33864]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8800 (Press CTRL+C to quit)
+INFO:     127.0.0.1:56010 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56011 - "GET /admin/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56015 - "GET /admin/mapa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56017 - "GET /admin/grupos HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56019 - "GET /admin/camaras/nueva HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55373 - "POST /admin/camaras/nueva HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:55375 - "GET /admin/camaras/2/zonas?nuevo=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64505 - "GET /admin/camaras/2/zonas?nuevo=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53955 - "POST /admin/camaras/2/zonas HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59965 - "POST /admin/grupos HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:64923 - "GET /admin/grupos HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56178 - "POST /admin/camaras/1/editar HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:56180 - "GET /admin/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56182 - "POST /admin/camaras/2/editar HTTP/1.1" 303 See Other
+INFO:     127.0.0.1:56184 - "GET /admin/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /admin/grupos/1/corredor HTTP/1.1" 200 OK

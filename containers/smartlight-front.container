@@ -1,0 +1,20 @@
+[Unit]
+Description=Smartlight Front
+
+[Container]
+ContainerName=smartlight-front
+HostName=smartlight-front
+#Image=smartlight-front.build
+Image=localhost/smartlight-front
+
+#Environment=SECRET_KEY=${SECRET_KEY:-dev}
+#Environment=FRONTEND_SUBPATH=/smartlight
+
+Environment=BACKEND_HOST=http://back
+Environment=BACKEND_PORT=8888
+#Environment=BACKEND_PUBLIC_URL=${BACKEND_PUBLIC_URL:-http://localhost:8888}
+
+PublishPort=8800:8800
+
+[Install]
+WantedBy=default.target
