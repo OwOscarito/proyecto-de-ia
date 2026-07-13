@@ -9,8 +9,8 @@ ENV UV_NO_DEV=1
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-COPY SmartLight-Front/pyproject.toml SmartLight-Front/uv.lock ./
-RUN uv sync --locked
+COPY SmartLight-Front/pyproject.toml ./
+RUN uv sync
 
 COPY SmartLight-Front/app ./app
 

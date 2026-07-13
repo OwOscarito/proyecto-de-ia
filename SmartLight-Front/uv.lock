@@ -309,7 +309,7 @@ wheels = [
 ]
 
 [[package]]
-name = "smartlight-back"
+name = "smartlight-front"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

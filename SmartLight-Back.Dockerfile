@@ -14,12 +14,9 @@ ENV UV_NO_DEV=1
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-COPY SmartLight-Back/pyproject.toml SmartLight-Back/uv.lock ./
+COPY SmartLight-Back/pyproject.toml ./
 
-# torch/torchvision ya vienen instalados en la imagen base de NVIDIA con el
-# build CUDA correcto para la GPU del host; instalarlos otra vez desde PyPI
-# duplicaría ~6GB y podría traer una versión de CUDA distinta a la del driver.
-RUN uv sync --locked
+RUN uv sync
 
 COPY SmartLight-Back/app ./app
 
