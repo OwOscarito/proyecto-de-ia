@@ -10,9 +10,9 @@ templates = Jinja2Templates(directory=str(APP_DIR / "templates"))
 @router.get("/")
 async def index(request: Request, activada: str | None = None):
     return templates.TemplateResponse(
-        request,
-        "index.html",
-        {
+        request=request,
+        name="index.html",
+        conxtext={
             "backend_url": BACKEND_PUBLIC_URL,
             "camara_activada": activada == "1",
         },

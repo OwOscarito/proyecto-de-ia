@@ -3,13 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <title>Semaforo Adaptativo — Monitor</title>
-    <link rel="stylesheet" href="/static/styles/style.css" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='/styles/style.css') }}"
+    />
   </head>
   <body>
     {% if camara_activada %}
     <div id="aviso-activacion">
-      Cámara activada ✓ — el backend la tomará automáticamente en unos
-      segundos (sin reiniciar nada).
+      Cámara activada ✓ — el backend la tomará automáticamente en unos segundos
+      (sin reiniciar nada).
     </div>
     {% endif %}
 
@@ -66,14 +69,16 @@
         <div id="status">Desconectado</div>
       </div>
 
-      <a class="card" id="admin-link" href="/admin/">Panel admin →</a>
+      <a class="card" id="admin-link" href="{{ url_for('admin_lista') }}"
+        >Panel admin →</a
+      >
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script type="text/javascript" charset="utf-8">
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
-      var SOCKET_URL = "{{ backend_url }}";
+      const SOCKET_URL = "{{ backend_url }}";
 
       function actualizarLuces(fase) {
         document.getElementById("luz-red").className = "luz";
