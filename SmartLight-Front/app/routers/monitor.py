@@ -12,7 +12,7 @@ async def index(request: Request, activada: str | None = None):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        conxtext={
+        context={
             "backend_url": BACKEND_PUBLIC_URL,
             "camara_activada": activada == "1",
         },
