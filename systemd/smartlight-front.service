@@ -12,8 +12,9 @@ WorkingDirectory=%h/smartlight/SmartLight-Front
 Environment=BACKEND_HOST=http://back
 Environment=BACKEND_PORT=8888
 #Environment=BACKEND_PUBLIC_URL=${BACKEND_PUBLIC_URL:-http://localhost:8888}
-
-ExecStart=%h/.local/bin/uv run uvicorn app.main:asgi_app --host 0.0.0.0 --port 8800
+#
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin
+ExecStart=%h/.local/bin/uv run uvicorn app.main:app --host 0.0.0.0 --port 8800
 
 Restart=on-failure
 RestartSec=5
