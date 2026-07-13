@@ -27,7 +27,7 @@ async def _archivo_o_none(video: UploadFile | None):
     return None
 
 
-@router.get("/")
+@router.get("/", name="admin_lista")
 async def lista(request: Request):
     camaras = await api_client.listar_camaras()
     return templates.TemplateResponse(
@@ -37,7 +37,7 @@ async def lista(request: Request):
     )
 
 
-@router.get("/camaras/nueva")
+@router.get("/camaras/nueva", name="admin_nueva_camara")
 async def get_nueva_camara(request: Request):
     grupos = await api_client.listar_grupos()
     return templates.TemplateResponse(
@@ -47,7 +47,7 @@ async def get_nueva_camara(request: Request):
     )
 
 
-@router.post("/camaras/nueva")
+@router.post("/camaras/nueva", name="admin_crear_camara")
 async def post_nueva_camara(
     request: Request,
     nombre: str = Form(...),
@@ -92,7 +92,7 @@ async def post_nueva_camara(
     )
 
 
-@router.get("/camaras/{camara_id}/editar")
+@router.get("/camaras/{camara_id}/editar", name="admin_editar_camara")
 async def get_editar(request: Request, camara_id: int):
     camara = await api_client.obtener_camara(camara_id)
     if camara is None:
@@ -106,7 +106,7 @@ async def get_editar(request: Request, camara_id: int):
     )
 
 
-@router.post("/camaras/{camara_id}/editar")
+@router.post("/camaras/{camara_id}/editar", name="admin_guardar_camara")
 async def post_editar(
     request: Request,
     camara_id: int,
@@ -145,26 +145,28 @@ async def post_editar(
                 "camara": camara,
                 "paso_nuevo": False,
                 "grupos": grupos,
-                "error": exc.response.json().get("detail", "Error al guardar la cámara."),
+                "error": exc.response.json().get(
+                    "detail", "Error al guardar la cámara."
+                ),
             },
         )
 
     return RedirectResponse("/admin/", status_code=303)
 
 
-@router.post("/camaras/{camara_id}/eliminar")
+@router.post("/camaras/{camara_id}/eliminar", name="admin_eliminar_camara")
 async def post_eliminar(camara_id: int):
     await api_client.eliminar_camara(camara_id)
     return RedirectResponse("/admin/", status_code=303)
 
 
-@router.post("/camaras/{camara_id}/activar")
+@router.post("/camaras/{camara_id}/activar", name="admin_activar_camara")
 async def post_activar(camara_id: int):
     await api_client.activar_camara(camara_id)
     return RedirectResponse("/?activada=1", status_code=303)
 
 
-@router.get("/camaras/{camara_id}/zonas")
+@router.get("/camaras/{camara_id}/zonas", name="admin_zonas_camara")
 async def get_zonas(request: Request, camara_id: int, nuevo: str | None = None):
     camara = await api_client.obtener_camara(camara_id)
     if camara is None:
@@ -181,7 +183,7 @@ async def get_zonas(request: Request, camara_id: int, nuevo: str | None = None):
     )
 
 
-@router.post("/camaras/{camara_id}/zonas")
+@router.post("/camaras/{camara_id}/zonas", name="admin_guardar_zona")
 async def post_zonas(camara_id: int, payload: dict):
     await api_client.guardar_zona(
         camara_id, payload["tipo"], payload["puntos"], payload.get("color")
@@ -189,7 +191,7 @@ async def post_zonas(camara_id: int, payload: dict):
     return {"ok": True}
 
 
-@router.get("/mapa")
+@router.get("/mapa", name="admin_mapa")
 async def mapa(request: Request):
     camaras = await api_client.listar_camaras()
     return templates.TemplateResponse(
@@ -197,7 +199,7 @@ async def mapa(request: Request):
     )
 
 
-@router.get("/grupos")
+@router.get("/grupos", name="admin_grupos")
 async def grupos(request: Request):
     lista_grupos = await api_client.listar_grupos()
     return templates.TemplateResponse(
@@ -207,13 +209,13 @@ async def grupos(request: Request):
     )
 
 
-@router.post("/grupos")
+@router.post("/grupos", name="admin_crear_grupo")
 async def post_grupo(nombre: str = Form(...)):
     await api_client.crear_grupo(nombre)
     return RedirectResponse("/admin/grupos", status_code=303)
 
 
-@router.get("/grupos/{grupo_id}")
+@router.get("/grupos/{grupo_id}", name="admin_grupo_detalle")
 async def grupo_detalle(request: Request, grupo_id: int):
     grupo = await api_client.obtener_grupo(grupo_id)
     if grupo is None:
@@ -226,7 +228,7 @@ async def grupo_detalle(request: Request, grupo_id: int):
     )
 
 
-@router.get("/grupos/{grupo_id}/corredor")
+@router.get("/grupos/{grupo_id}/corredor", name="admin_corredor")
 async def corredor(request: Request, grupo_id: int):
     grupo = await api_client.obtener_grupo(grupo_id)
     if grupo is None:
