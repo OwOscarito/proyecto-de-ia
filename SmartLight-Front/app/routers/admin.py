@@ -27,7 +27,7 @@ async def _archivo_o_none(video: UploadFile | None):
     return None
 
 
-@router.get("/")
+@router.get("/", name="admin_lista")
 async def lista(request: Request):
     camaras = await api_client.listar_camaras()
     return templates.TemplateResponse(
@@ -145,7 +145,9 @@ async def post_editar(
                 "camara": camara,
                 "paso_nuevo": False,
                 "grupos": grupos,
-                "error": exc.response.json().get("detail", "Error al guardar la cámara."),
+                "error": exc.response.json().get(
+                    "detail", "Error al guardar la cámara."
+                ),
             },
         )
 
