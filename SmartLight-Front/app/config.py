@@ -8,6 +8,9 @@ load_dotenv()
 APP_DIR = Path(__file__).resolve().parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "dev")
+
+FRONTEND_SUBPATH = os.getenv("FRONTEND_SUBPATH", "")
+
 BACKEND_HOST = os.getenv("BACKEND_HOST", "http://127.0.0.1")
 BACKEND_PORT = os.getenv("BACKEND_PORT", "8888")
 
