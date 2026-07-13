@@ -7,7 +7,7 @@ router = APIRouter()
 templates = Jinja2Templates(directory=str(APP_DIR / "templates"))
 
 
-@router.get("/")
+@router.get("/", name="monitor_index")
 async def index(request: Request, activada: str | None = None):
     return templates.TemplateResponse(
         request=request,
