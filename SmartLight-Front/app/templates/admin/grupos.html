@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Corredores — Centro de Control</title>
-    <link rel="stylesheet" href="/static/styles/style.css" />
-    <link rel="stylesheet" href="/static/styles/admin.css" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles/admin.css') }}" />
   </head>
   <body class="admin-body">
     {% include "admin/_sidebar.html" %}
@@ -18,7 +18,7 @@
       </div>
 
       <div class="card" style="max-width: 420px; margin-bottom: 24px">
-        <form method="post" class="form-camara">
+        <form method="post" action="{{ url_for('admin_crear_grupo') }}" class="form-camara">
           <label>
             Nombre del corredor
             <input
@@ -40,9 +40,9 @@
             <div class="nombre">{{ g.nombre }}</div>
             <div class="fuente">{{ g.n_camaras }} / 4 cámaras</div>
             <div class="camera-acciones">
-              <a class="btn" href="/admin/grupos/{{ g.id }}">Gestionar</a>
+              <a class="btn" href="{{ url_for('admin_grupo_detalle', grupo_id=g.id) }}">Gestionar</a>
               {% if g.n_camaras > 0 %}
-              <a class="btn btn-primary" href="/admin/grupos/{{ g.id }}/corredor">▶ Ver corredor</a>
+              <a class="btn btn-primary" href="{{ url_for('admin_corredor', grupo_id=g.id) }}">▶ Ver corredor</a>
               {% endif %}
             </div>
           </div>

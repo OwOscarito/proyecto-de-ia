@@ -4,14 +4,14 @@
     Centro de Control<br />de Tráfico
   </div>
   <nav>
-    <a href="/">
+    <a href="{{ url_for('monitor_index') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 12l2-2 7-7 7 7 2 2" />
         <path d="M5 10v10h14V10" />
       </svg>
       Monitor en vivo
     </a>
-    <a href="/admin/" class="{{ 'active' if activo == 'camaras' else '' }}">
+    <a href="{{ url_for('admin_lista') }}" class="{{ 'active' if activo == 'camaras' else '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <rect x="3" y="3" width="7" height="7" rx="1" />
         <rect x="14" y="3" width="7" height="7" rx="1" />
@@ -20,14 +20,14 @@
       </svg>
       Cámaras
     </a>
-    <a href="/admin/mapa" class="{{ 'active' if activo == 'mapa' else '' }}">
+    <a href="{{ url_for('admin_mapa') }}" class="{{ 'active' if activo == 'mapa' else '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 21s-7-7.5-7-12a7 7 0 1 1 14 0c0 4.5-7 12-7 12z" />
         <circle cx="12" cy="9" r="2.5" />
       </svg>
       Mapa
     </a>
-    <a href="/admin/grupos" class="{{ 'active' if activo == 'grupos' else '' }}">
+    <a href="{{ url_for('admin_grupos') }}" class="{{ 'active' if activo == 'grupos' else '' }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <circle cx="6" cy="6" r="3" />
         <circle cx="18" cy="6" r="3" />

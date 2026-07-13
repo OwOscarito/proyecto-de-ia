@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Cámaras — Centro de Control</title>
-    <link rel="stylesheet" href="/static/styles/style.css" />
-    <link rel="stylesheet" href="/static/styles/admin.css" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles/admin.css') }}" />
   </head>
   <body class="admin-body">
     {% include "admin/_sidebar.html" %}
@@ -15,7 +15,7 @@
           <h1>Cámaras configuradas</h1>
           <p>Gestiona las cámaras del sistema y sus zonas de detección</p>
         </div>
-        <a class="btn btn-primary" href="/admin/camaras/nueva">+ Agregar cámara</a>
+        <a class="btn btn-primary" href="{{ url_for('admin_nueva_camara') }}">+ Agregar cámara</a>
       </div>
 
       {% if camaras %}
@@ -59,17 +59,17 @@
             <div class="fuente">{{ camara.fuente }}</div>
 
             <div class="camera-acciones">
-              <a class="btn" href="/admin/camaras/{{ camara.id }}/zonas">Zonas</a>
-              <a class="btn" href="/admin/camaras/{{ camara.id }}/editar">Editar</a>
+              <a class="btn" href="{{ url_for('admin_zonas_camara', camara_id=camara.id) }}">Zonas</a>
+              <a class="btn" href="{{ url_for('admin_editar_camara', camara_id=camara.id) }}">Editar</a>
               {% if camara.activa %}
               <a class="btn btn-primary" href="/">▶ Ver en vivo</a>
               {% else %}
-              <form method="post" action="/admin/camaras/{{ camara.id }}/activar">
+              <form method="post" action="{{ url_for('admin_activar_camara', camara_id=camara.id) }}">
                 <button class="btn btn-primary" type="submit">Activar</button>
               </form>
               <form
                 method="post"
-                action="/admin/camaras/{{ camara.id }}/eliminar"
+                action="{{ url_for('admin_eliminar_camara', camara_id=camara.id) }}"
                 onsubmit="return confirm('¿Eliminar esta cámara?')"
               >
                 <button class="btn btn-danger" type="submit">Eliminar</button>
@@ -83,7 +83,7 @@
       {% else %}
       <div class="empty-state">
         No hay cámaras configuradas todavía.<br />
-        <a class="btn btn-primary" style="margin-top: 12px" href="/admin/camaras/nueva"
+        <a class="btn btn-primary" style="margin-top: 12px" href="{{ url_for('admin_nueva_camara') }}"
           >+ Agregar la primera cámara</a
         >
       </div>
