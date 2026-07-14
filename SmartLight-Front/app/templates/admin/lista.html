@@ -62,7 +62,7 @@
               <a class="btn" href="{{ url_for('admin_zonas_camara', camara_id=camara.id) }}">Zonas</a>
               <a class="btn" href="{{ url_for('admin_editar_camara', camara_id=camara.id) }}">Editar</a>
               {% if camara.activa %}
-              <a class="btn btn-primary" href="/">▶ Ver en vivo</a>
+              <a class="btn btn-primary" href="{{ url_for('monitor_index') }}">▶ Ver en vivo</a>
               {% else %}
               <form method="post" action="{{ url_for('admin_activar_camara', camara_id=camara.id) }}">
                 <button class="btn btn-primary" type="submit">Activar</button>
