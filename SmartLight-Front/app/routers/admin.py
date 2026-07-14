@@ -87,16 +87,14 @@ async def post_nueva_camara(
             },
         )
 
-    return RedirectResponse(
-        f"/admin/camaras/{camara['id']}/zonas?nuevo=1", status_code=303
-    )
+    return RedirectResponse(str(request.url_for("admin_zonas_camara", camara_id=camara["id"], nuevo="1")), status_code=303)
 
 
 @router.get("/camaras/{camara_id}/editar", name="admin_editar_camara")
 async def get_editar(request: Request, camara_id: int):
     camara = await api_client.obtener_camara(camara_id)
     if camara is None:
-        return RedirectResponse("/admin/", status_code=303)
+        return RedirectResponse(str(request.url_for("admin_lista")), status_code=303)
 
     grupos = await api_client.listar_grupos()
     return templates.TemplateResponse(
@@ -151,26 +149,26 @@ async def post_editar(
             },
         )
 
-    return RedirectResponse("/admin/", status_code=303)
+    return RedirectResponse(str(request.url_for("admin_lista")), status_code=303)
 
 
 @router.post("/camaras/{camara_id}/eliminar", name="admin_eliminar_camara")
-async def post_eliminar(camara_id: int):
+async def post_eliminar(request: Request, camara_id: int):
     await api_client.eliminar_camara(camara_id)
-    return RedirectResponse("/admin/", status_code=303)
+    return RedirectResponse(str(request.url_for("admin_lista")), status_code=303)
 
 
 @router.post("/camaras/{camara_id}/activar", name="admin_activar_camara")
-async def post_activar(camara_id: int):
+async def post_activar(request: Request, camara_id: int):
     await api_client.activar_camara(camara_id)
-    return RedirectResponse("/?activada=1", status_code=303)
+    return RedirectResponse(str(request.url_for("monitor_index")), status_code=303)
 
 
 @router.get("/camaras/{camara_id}/zonas", name="admin_zonas_camara")
 async def get_zonas(request: Request, camara_id: int, nuevo: str | None = None):
     camara = await api_client.obtener_camara(camara_id)
     if camara is None:
-        return RedirectResponse("/admin/", status_code=303)
+        return RedirectResponse(str(request.url_for("admin_lista")), status_code=303)
 
     return templates.TemplateResponse(
         request,
@@ -210,16 +208,16 @@ async def grupos(request: Request):
 
 
 @router.post("/grupos", name="admin_crear_grupo")
-async def post_grupo(nombre: str = Form(...)):
+async def post_grupo(request: Request, nombre: str = Form(...)):
     await api_client.crear_grupo(nombre)
-    return RedirectResponse("/admin/grupos", status_code=303)
+    return RedirectResponse(str(request.url_for("admin_grupos")), status_code=303)
 
 
 @router.get("/grupos/{grupo_id}", name="admin_grupo_detalle")
 async def grupo_detalle(request: Request, grupo_id: int):
     grupo = await api_client.obtener_grupo(grupo_id)
     if grupo is None:
-        return RedirectResponse("/admin/grupos", status_code=303)
+        return RedirectResponse(str(request.url_for("admin_grupos")), status_code=303)
 
     return templates.TemplateResponse(
         request,
@@ -232,7 +230,7 @@ async def grupo_detalle(request: Request, grupo_id: int):
 async def corredor(request: Request, grupo_id: int):
     grupo = await api_client.obtener_grupo(grupo_id)
     if grupo is None:
-        return RedirectResponse("/admin/grupos", status_code=303)
+        return RedirectResponse(str(request.url_for("admin_grupos")), status_code=303)
 
     return templates.TemplateResponse(
         request,
